@@ -1,6 +1,7 @@
 import sys
 import pygame
 from tilemap import Tilemap
+from entities import Entity
 
 DISPLAY_WIDTH = 256
 DISPLAY_HEIGHT = 240
@@ -19,10 +20,21 @@ class Game:
         self.level = Tilemap()
         self.level.load_level("assets/1-1.tmx")
 
+        def load_image(path):
+            img = pygame.image.load(path)
+            img.set_colorkey((146, 144, 255))
+            return img
+
+        self.assets = {
+            "mario_standing": load_image("assets/mario.png")
+        }
+        self.player = Entity(self.level.get_spawn_pos("player_spawn"))
+
     def run(self):
         while True:
             self.display.fill((148, 148, 255))
             self.level.render_visible_layers(self.display)
+            self.player.render(self.assets["mario_standing"], self.display)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
