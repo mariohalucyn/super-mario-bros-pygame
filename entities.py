@@ -1,24 +1,34 @@
 import pygame
 
-
 JUMP_FORCE = -5.5
-ACCELERATION = 0.04
-FRICTION = 0.04
-GRAVITY = 0.22
-SKID_SENSITIVITY = 0.1
+ACCELERATION = 0.03
+FRICTION = 0.03
+GRAVITY = 0.21
+SKID_SENSITIVITY = 0.2
+
 
 class Entity:
     def __init__(self, pos, image):
         self.pos = pygame.math.Vector2(pos[0], pos[1])
         self.vel = pygame.math.Vector2(0, 0)
         self.image = image
-        self.collisions = {"left": False, "right": False, "up": False, "down": False}
+        self.collisions = {
+            "left": False,
+            "right": False,
+            "up": False,
+            "down": False,
+        }
         self.on_ground = False
         self.coyote_timer = 0
         self.jump_buffer = 0
 
     def rect(self):
-        return pygame.Rect(int(self.pos.x), int(self.pos.y), self.image.get_width(), self.image.get_height())
+        return pygame.Rect(
+            int(self.pos.x),
+            int(self.pos.y),
+            self.image.get_width(),
+            self.image.get_height(),
+        )
 
     def jump(self):
         self.jump_buffer = 5
@@ -29,7 +39,6 @@ class Entity:
         self.jump_buffer = 0
 
     def update(self, keys, collision_rects):
-
         if self.jump_buffer > 0:
             self.jump_buffer -= 1
         if self.coyote_timer > 0:
@@ -42,23 +51,25 @@ class Entity:
         input_axis = 0
         if keys[pygame.K_LEFT]:
             input_axis = -1
-        elif keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT]:
             input_axis = 1
 
         if input_axis != 0:
-            if (input_axis > 0 and self.vel.x < 0) or (input_axis < 0 and self.vel.x > 0):
+            if input_axis > 0 > self.vel.x:
+                self.vel.x += input_axis * SKID_SENSITIVITY
+            if input_axis < 0 < self.vel.x:
                 self.vel.x += input_axis * SKID_SENSITIVITY
             else:
                 self.vel.x += input_axis * ACCELERATION
         else:
             if self.vel.x > 0:
                 self.vel.x = max(0, self.vel.x - FRICTION)
-            elif self.vel.x < 0:
+            if self.vel.x < 0:
                 self.vel.x = min(0, self.vel.x + FRICTION)
 
         if self.vel.x > max_speed:
             self.vel.x = max_speed
-        elif self.vel.x < -max_speed:
+        if self.vel.x < -max_speed:
             self.vel.x = -max_speed
 
         self.pos.x += self.vel.x
@@ -70,7 +81,7 @@ class Entity:
                 if self.vel.x > 0:
                     self.pos.x = block.left - self.image.get_width()
                     self.collisions["right"] = True
-                elif self.vel.x < 0:
+                if self.vel.x < 0:
                     self.pos.x = block.right
                     self.collisions["left"] = True
                 self.vel.x = 0
@@ -93,7 +104,7 @@ class Entity:
                     self.on_ground = True
                     self.vel.y = 0
                     self.coyote_timer = 6
-                elif self.vel.y < 0:
+                if self.vel.y < 0:
                     self.pos.y = block.bottom
                     self.collisions["up"] = True
                     self.vel.y = 0
@@ -106,4 +117,6 @@ class Entity:
             self.on_ground = False
 
     def render(self, surf, offset=(0, 0)):
-        surf.blit(self.image, (int(self.pos.x - offset[0]), int(self.pos.y - offset[1])))
+        dest_x = int(self.pos.x - offset[0])
+        dest_y = int(self.pos.y - offset[1])
+        surf.blit(self.image, (dest_x, dest_y))
