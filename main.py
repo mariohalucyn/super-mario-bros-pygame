@@ -2,6 +2,7 @@ import sys
 import pygame
 from tilemap import Tilemap
 from entities import Entity
+import helpers
 
 DISPLAY_WIDTH = 256
 DISPLAY_HEIGHT = 240
@@ -19,22 +20,17 @@ class Game:
         self.clock = pygame.time.Clock()
         self.level = Tilemap()
         self.level.load_level("assets/1-1.tmx")
-
-        def load_image(path):
-            img = pygame.image.load(path)
-            img.set_colorkey((146, 144, 255))
-            return img
-
+        self.scroll = [0, 0]
         self.assets = {
-            "small_mario_standing": load_image("assets/small_mario_standing.png")
+            "small_mario_standing": helpers.load_image("assets/small_mario_standing.png")
         }
         self.player = Entity(self.level.get_spawn_pos("player_spawn"), self.assets["small_mario_standing"])
 
     def run(self):
         while True:
             self.display.fill((148, 148, 255))
-            self.level.render_visible_layers(self.display)
-            self.player.render(self.display)
+            self.level.render_visible_layers(self.display, offset=self.scroll)
+            self.player.render(self.display, offset=self.scroll)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

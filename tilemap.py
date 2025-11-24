@@ -24,10 +24,10 @@ class Tilemap:
             if obj.name == name:
                 return obj.x, obj.y
 
-    def render_visible_layers(self, surf):
+    def render_visible_layers(self, surf, offset=(0, 0)):
         for layer in self.tmx_data.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
                 for x, y, gid in layer:
                     tile = self.tmx_data.get_tile_image_by_gid(gid)
                     if tile:
-                        surf.blit(tile, (x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight))
+                        surf.blit(tile, (x * self.tmx_data.tilewidth - offset[0], y * self.tmx_data.tileheight - offset[1]))

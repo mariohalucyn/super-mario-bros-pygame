@@ -25,5 +25,5 @@ class Entity:
 
         self.pos.x += int(entity_acc)
 
-    def render(self, surf):
-        surf.blit(self.image, (self.pos.x, self.pos.y))
+    def render(self, surf, offset=(0, 0)):
+        surf.blit(self.image, (self.pos.x - offset[0], self.pos.y - offset[1]))
