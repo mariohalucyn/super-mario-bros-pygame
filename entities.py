@@ -1,6 +1,12 @@
 import pygame
 
 
+JUMP_FORCE = -5.5
+ACCELERATION = 0.04
+FRICTION = 0.04
+GRAVITY = 0.22
+SKID_SENSITIVITY = 0.1
+
 class Entity:
     def __init__(self, pos, image):
         self.pos = pygame.math.Vector2(pos[0], pos[1])
@@ -8,16 +14,26 @@ class Entity:
         self.image = image
         self.collisions = {"left": False, "right": False, "up": False, "down": False}
         self.on_ground = False
+        self.coyote_timer = 0
+        self.jump_buffer = 0
 
     def rect(self):
         return pygame.Rect(int(self.pos.x), int(self.pos.y), self.image.get_width(), self.image.get_height())
 
+    def jump(self):
+        self.jump_buffer = 5
+
+    def cancel_jump(self):
+        if self.vel.y < -2.0:
+            self.vel.y = -2.0
+        self.jump_buffer = 0
+
     def update(self, keys, collision_rects):
-        ACCELERATION = 0.05
-        FRICTION = 0.05
-        GRAVITY = 0.22
-        JUMP_FORCE = -5.5
-        SKID_SENSITIVITY = 0.1
+
+        if self.jump_buffer > 0:
+            self.jump_buffer -= 1
+        if self.coyote_timer > 0:
+            self.coyote_timer -= 1
 
         max_speed = 1.5
         if keys[pygame.K_x]:
@@ -60,14 +76,6 @@ class Entity:
                 self.vel.x = 0
                 entity_rect = self.rect()
 
-        if keys[pygame.K_c]:
-            if self.on_ground:
-                self.vel.y = JUMP_FORCE
-                self.on_ground = False
-        if not keys[pygame.K_c]:
-            if self.vel.y < -2.0:
-                self.vel.y = -2.0
-
         self.vel.y += GRAVITY
         self.vel.y = min(self.vel.y, 4.0)
 
@@ -84,11 +92,18 @@ class Entity:
                     self.collisions["down"] = True
                     self.on_ground = True
                     self.vel.y = 0
+                    self.coyote_timer = 6
                 elif self.vel.y < 0:
                     self.pos.y = block.bottom
                     self.collisions["up"] = True
                     self.vel.y = 0
                 entity_rect = self.rect()
+
+        if self.jump_buffer > 0 and self.coyote_timer > 0:
+            self.vel.y = JUMP_FORCE
+            self.jump_buffer = 0
+            self.coyote_timer = 0
+            self.on_ground = False
 
     def render(self, surf, offset=(0, 0)):
         surf.blit(self.image, (int(self.pos.x - offset[0]), int(self.pos.y - offset[1])))

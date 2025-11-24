@@ -40,6 +40,14 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_c:
+                        self.player.jump()
+
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_c:
+                        self.player.cancel_jump()
+
             keys = pygame.key.get_pressed()
             self.player.update(keys, self.collision_rects)
 
