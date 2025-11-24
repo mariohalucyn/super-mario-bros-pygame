@@ -8,6 +8,9 @@ class Entity:
         self.acc = pygame.math.Vector2(0, 0)
         self.image = image
 
+    def rect(self):
+        return pygame.Rect(self.pos.x, self.pos.y, self.image.get_width(), self.image.get_height())
+
     def update(self, keys):
         '''
         Comparison Table (Mario's Speeds)
