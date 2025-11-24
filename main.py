@@ -26,23 +26,27 @@ class Game:
             return img
 
         self.assets = {
-            "mario_standing": load_image("assets/mario.png")
+            "small_mario_standing": load_image("assets/small_mario_standing.png")
         }
-        self.player = Entity(self.level.get_spawn_pos("player_spawn"))
+        self.player = Entity(self.level.get_spawn_pos("player_spawn"), self.assets["small_mario_standing"])
 
     def run(self):
         while True:
             self.display.fill((148, 148, 255))
             self.level.render_visible_layers(self.display)
-            self.player.render(self.assets["mario_standing"], self.display)
+            self.player.render(self.display)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
 
+            keys = pygame.key.get_pressed()
+            self.player.update(keys)
+
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.update()
+
             self.clock.tick(60)
 
 
