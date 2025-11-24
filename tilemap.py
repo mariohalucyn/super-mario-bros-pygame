@@ -15,7 +15,7 @@ class Tilemap:
         for x, y, gid in terrain:
             if gid != 0:
                 rect = pygame.Rect(x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight, self.tmx_data.tilewidth, self.tmx_data.tileheight)
-            self.collision_rects.append(rect)
+                self.collision_rects.append(rect)
         return self.collision_rects
 
     def get_spawn_pos(self, name):

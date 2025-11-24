@@ -25,23 +25,23 @@ class Game:
             "small_mario_standing": helpers.load_image("assets/small_mario_standing.png")
         }
         self.player = Entity(self.level.get_spawn_pos("player_spawn"), self.assets["small_mario_standing"])
+        self.collision_rects = self.level.get_collision_rects()
 
     def run(self):
         while True:
             self.display.fill((148, 148, 255))
             self.level.render_visible_layers(self.display, offset=self.scroll)
             self.player.render(self.display, offset=self.scroll)
-            relative_player_pos = self.player.pos.x - self.scroll[0]
+            relative_player_pos = self.player.rect()[0] - self.scroll[0]
             if self.player.pos.x and relative_player_pos / self.display.get_width() > 1/3:
-                self.scroll[0] += 1
-
+                self.scroll[0] += self.player.vel.x
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
 
             keys = pygame.key.get_pressed()
-            self.player.update(keys)
+            self.player.update(keys, self.collision_rects)
 
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.update()
