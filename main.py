@@ -35,7 +35,7 @@ class Game:
             relative_player_pos = self.player.rect()[0] - self.scroll[0]
             if self.player.pos.x and relative_player_pos / self.display.get_width() > 1/3:
                 if self.player.vel.x > 0:
-                    self.scroll[0] += int(self.player.vel.x)
+                    self.scroll[0] += self.player.vel.x
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
