@@ -8,10 +8,14 @@ SKID_SENSITIVITY = 0.2
 
 
 class Entity:
-    def __init__(self, pos, image):
+    def __init__(self, pos, assets, action="idle"):
         self.pos = pygame.math.Vector2(pos[0], pos[1])
         self.vel = pygame.math.Vector2(0, 0)
-        self.image = image
+        self.assets = assets
+        self.action = action
+        self.frame_index = 0
+        self.image = self.assets[self.action][self.frame_index]
+        self.flip = False
         self.collisions = {
             "left": False,
             "right": False,
@@ -37,6 +41,11 @@ class Entity:
         if self.vel.y < -2.0:
             self.vel.y = -2.0
         self.jump_buffer = 0
+
+    def set_action(self, action):
+        if self.action != action:
+            self.action = action
+            self.frame_index = 0
 
     def update(self, keys, collision_rects):
         if self.jump_buffer > 0:
@@ -115,6 +124,30 @@ class Entity:
             self.jump_buffer = 0
             self.coyote_timer = 0
             self.on_ground = False
+
+        if input_axis > 0:
+            self.flip = False
+        elif input_axis < 0:
+            self.flip = True
+
+        if self.coyote_timer > 0:
+            if abs(self.vel.x) > 0.1:
+                self.set_action("run")
+            else:
+                self.set_action("idle")
+        else:
+            self.set_action("jump")
+
+        if self.action == "run":
+            self.frame_index += 0.08
+        else:
+            self.frame_index += 0.03
+
+        if self.frame_index >= len(self.assets[self.action]):
+            self.frame_index = 0
+
+        current_image = self.assets[self.action][int(self.frame_index)]
+        self.image = pygame.transform.flip(current_image, self.flip, False)
 
     def render(self, surf, offset=(0, 0)):
         dest_x = int(self.pos.x - offset[0])

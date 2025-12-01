@@ -28,6 +28,14 @@ class Tilemap:
             if obj.name == name:
                 return obj.x, obj.y
 
+    def extract_enemies(self, name):
+        enemy_positions = []
+        entities = self.tmx_data.get_layer_by_name("entities")
+        for obj in entities:
+            if obj.name == name:
+                enemy_positions.append((obj.x, obj.y))
+        return enemy_positions
+
     def render_visible_layers(self, surf, offset=(0, 0)):
         for layer in self.tmx_data.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
